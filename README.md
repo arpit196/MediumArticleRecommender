@@ -18,11 +18,9 @@ Tech Stack & Tools
    - Vector Operations: SciPy (Cosine Similarity metrics)
 
 ---
-***
----
 
 To Run the Recommender Service on Docker:
 
 1 Build the image:
-'''docker build -t rec-engine:latest .
+```docker build -t rec-engine:latest .
 
