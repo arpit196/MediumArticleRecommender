@@ -16,3 +16,13 @@ Tech Stack & Tools
    - Embeddings & NLP: HuggingFace Transformers / SentenceTransformers, Rank-BM25
    - Data Processing: Pandas, NumPy, Scikit-Learn
    - Vector Operations: SciPy (Cosine Similarity metrics)
+
+---
+***
+---
+
+To Run the Recommender Service on Docker:
+
+1 Build the image:
+'''docker build -t rec-engine:latest .
+
