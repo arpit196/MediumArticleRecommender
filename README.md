@@ -23,6 +23,7 @@ To Run the Recommender Service on Docker:
 
 1 Build the image:
 ```docker build -t rec-engine:latest .```
+
 2. Start with Docker compose
 ```docker-compose up --build```
 
