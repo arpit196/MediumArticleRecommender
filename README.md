@@ -22,5 +22,13 @@ Tech Stack & Tools
 To Run the Recommender Service on Docker:
 
 1 Build the image:
-```docker build -t rec-engine:latest .
+```docker build -t rec-engine:latest .```
+2. Start with Docker compose
+```docker-compose up --build```
+
+3. Test endpoints
+```curl http://localhost:8080/health
+curl -X POST http://localhost:8080/api/retrieve \
+  -H "Content-Type: application/json" \
+  -d '{"query":"machine learning"}' ```
 
