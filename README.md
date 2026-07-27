@@ -31,5 +31,5 @@ To Run the Recommender Service on Docker:
 ```curl http://localhost:8080/health
 curl -X POST http://localhost:8080/api/retrieve \
   -H "Content-Type: application/json" \
-  -d '{"query":"machine learning"}' ```
+  -d '{"query":"machine learning"}' 
 
