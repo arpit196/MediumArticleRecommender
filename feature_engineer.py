@@ -1,4 +1,6 @@
 import ast
+import numpy as np
+import pandas as pd
 def clean_tags(tags_data):
     # If it's already a list, join it
     if isinstance(tags_data, list):
