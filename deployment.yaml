@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rec-engine-deployment
+  labels:
+    app: rec-engine
+spec:
+  replicas: 2 # Standard for High Availability (HA)
+  selector:
+    matchLabels:
+      app: rec-engine
+  template:
+    metadata:
+      labels:
+        app: rec-engine
+    spec: 
+      containers:
+      - name: rec-engine-container
+        image: arpit96/rec-engine:v1 # Replace with your pushed image
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5000
+        
+        # --- 1. Environment Variable Tuning ---
+        env:
+        # Crucial for PyTorch/FAISS: prevents OpenMP thread thrashing on multi-core nodes
+        - name: OMP_NUM_THREADS
+          value: "2" 
+        - name: MKL_NUM_THREADS
+          value: "2"
+        - name: MODEL_PATH
+          value: "./assets/all_mini_lm"
+        - name: FAISS_PATH
+          value: "./assets/my_index_quantized.faiss"
+        - name: METADATA_PATH
+          value: "./assets/articles_meta.json"
+        - name: TOKENIZED_CORPUS_PATH
+          value: "./assets/tokenized_corpus.json"
+
+        # --- 2. Resource Allocations ---
+        resources:
+          requests:
+            memory: "2Gi"  # Safe starting point to hold the model, FAISS index, and JSON in memory
+            cpu: "1"       # Minimum allocated CPU core
+          limits:
+            memory: "4Gi"  # Hard limit to prevent container from consuming entire node's RAM
+            cpu: "2"       # Restricts context switching overhead
+
+        # --- 3. Health & Initialization Probes ---
+        # Crucial: Gives Gunicorn time to load the heavy assets before checking health
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          failureThreshold: 30  # Allows up to 150 seconds (30 * 5s) to load assets into memory
+          periodSeconds: 5
+
+        # Confirms the pod is ready to handle incoming search queries
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+
+        # Continuously monitors the container health after it is running
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 20
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rec-engine-service
+spec:
+  type: ClusterIP # Keeps service private within the cluster. Use LoadBalancer if exposing directly.
+  selector:
+    app: rec-engine
+  ports:
+    - protocol: TCP
+      port: 80         # Port exposed on the cluster network
+      targetPort: 5000 # App container port

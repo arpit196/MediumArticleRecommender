@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rec-engine-deployment
+  labels:
+    app: rec-engine
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rec-engine
+  template:
+    metadata:
+      labels:
+        app: rec-engine
+    spec:
+      containers:
+      - name: rec-engine-container
+        image: arpit96/rec-engine:v1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5000
+        
+        # Safe single-worker, dual-thread profile
+        command: ["gunicorn"]
+        args: [
+          "--workers", "1", 
+          "--threads", "2", 
+          "--bind", "0.0.0.0:5000", 
+          "--timeout", "120", 
+          "app:app"
+        ]
+
+        env:
+        - name: OMP_NUM_THREADS
+          value: "1" 
+        - name: MKL_NUM_THREADS
+          value: "1"
+        - name: MODEL_PATH
+          value: "./assets/all_mini_lm"
+        - name: FAISS_PATH
+          value: "./assets/my_index_quantized.faiss"
+        - name: METADATA_PATH
+          value: "./assets/articles_meta.json"
+        - name: TOKENIZED_CORPUS_PATH
+          value: "./assets/tokenized_corpus.json"
+
+        # Tightly tailored to fit your 3072MB Minikube profile
+        resources:
+          requests:
+            memory: "1.5Gi"
+            cpu: "1.5"
+          limits:
+            memory: "2.5Gi"
+            cpu: "2.5"
+
+        # Relaxed startup buffer for a cold ML model initialization
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          failureThreshold: 30
+          periodSeconds: 10
+
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 15
+          timeoutSeconds: 3
+
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 4
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rec-engine-service
+spec:
+  type: ClusterIP
+  selector:
+    app: rec-engine
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
