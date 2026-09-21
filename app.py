@@ -46,10 +46,10 @@ if not LATENCY_LOG.exists():
 @dataclass(frozen=True)
 class Settings:
     NEWS_METADATA_PATH: str = os.getenv("NEWS_METADATA_PATH", "news.tsv")
-    FAISS_INDEX_PATH: str = os.getenv("FAISS_INDEX_PATH", "faiss_hnsw_index.bin")
-    EMBEDDINGS_MAP_PATH: str = os.getenv("EMBEDDINGS_MAP_PATH", "embeddings_map.pkl")
-    XGB_MODEL_PATH: str = os.getenv("XGB_MODEL_PATH", "xgb_news_rerankerx.json")
-    CTR_MAP_PATH: str = os.getenv("CTR_MAP_PATH", "impression_ctr_map.json")  # optional
+    FAISS_INDEX_PATH: str = os.getenv("FAISS_INDEX_PATH", "artifacts/recommender-v1.0/faiss_hnsw_index.bin")
+    EMBEDDINGS_MAP_PATH: str = os.getenv("EMBEDDINGS_MAP_PATH", "artifacts/recommender-v1.0/embeddings_map.pkl")
+    XGB_MODEL_PATH: str = os.getenv("XGB_MODEL_PATH", "artifacts/recommender-v1.0/xgb_news_rerankerx.json")
+    CTR_MAP_PATH: str = os.getenv("CTR_MAP_PATH", "artifacts/recommender-v1.0/impression_ctr_map.json")  # optional
     TOP_K_DEFAULT: int = int(os.getenv("TOP_K_DEFAULT", "10"))
     RETRIEVE_K_DEFAULT: int = int(os.getenv("RETRIEVE_K_DEFAULT", "100"))
     HOST: str = os.getenv("HOST", "0.0.0.0")

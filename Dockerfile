@@ -3,37 +3,36 @@ FROM python:3.11-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
+    MODEL_VERSION=recommender-v1.0 \
+    ARTIFACT_ROOT=/app/artifacts \
     NEWS_METADATA_PATH=/app/news.tsv \
-    FAISS_INDEX_PATH=/app/faiss_hnsw_index.bin \
-    EMBEDDINGS_MAP_PATH=/app/embeddings_map.pkl \
-    XGB_MODEL_PATH=/app/xgb_news_rerankerx.json \
-    CTR_MAP_PATH=/app/impression_ctr_map.json
+    HOST=0.0.0.0 \
+    PORT=8000
 
 WORKDIR /app
 
+# Runtime dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-       curl \
-       libgomp1 \
+        curl \
+        libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
+# Install Python dependencies first for better Docker layer caching
 COPY requirements.txt .
-
 RUN pip install --upgrade pip \
     && pip install -r requirements.txt
 
-# Copy application
+# Application code
 COPY app.py .
 
-# Copy inference artifacts
+# Metadata
 COPY news.tsv .
-COPY faiss_hnsw_index.bin .
-COPY embeddings_map.pkl .
-COPY xgb_news_rerankerx.json .
 
-# Optional CTR file - only include this COPY if the file actually exists
-# COPY impression_ctr_map.json .
+# Versioned model artifacts
+COPY artifacts/ ./artifacts/
 
+# Run as non-root
 RUN useradd --create-home --uid 10001 appuser \
     && chown -R appuser:appuser /app
 
