@@ -98,25 +98,8 @@ Recommendation quality is evaluated using ranking and retrieval metrics includin
 
 These metrics allow the retrieval and ranking stages to be evaluated independently rather than treating recommendation quality as a single black-box metric.
 
----
 
-## 🛠️ Tech Stack
-
-| Component                  | Technology                                      |
-| -------------------------- | ----------------------------------------------- |
-| Machine Learning / Ranking | XGBoost / Learning-to-Rank                      |
-| Dense Retrieval            | FAISS                                           |
-| Embeddings & NLP           | HuggingFace Transformers / SentenceTransformers |
-| Sparse Retrieval           | BM25 / Rank-BM25                                |
-| Data Processing            | Pandas, NumPy, Scikit-Learn                     |
-| API                        | FastAPI                                         |
-| Containerization           | Docker                                          |
-| Model Serving              | Uvicorn                                         |
-| Evaluation                 | NDCG, MRR, Recall@K, Precision@K                |
-
----
-
-## 🌐 Running the Recommendation Service
+## Running the Recommendation Service
 
 The inference service is implemented using **FastAPI**.
 
@@ -246,39 +229,6 @@ curl -X POST "http://localhost:8000/recommend" \
 > If Docker Compose maps container port `8000` to host port `8080`, replace `localhost:8000` with `localhost:8080`.
 
 ---
-
-## 🔄 Recommendation Flow
-
-```text
-User Reading History
-        │
-        ▼
-User Profile / Embedding
-        │
-        ├─────────────────────┐
-        ▼                     ▼
- Dense Vector Search       BM25 Search
-      (FAISS)                 │
-        │                     │
-        └──────────┬──────────┘
-                   ▼
-          Reciprocal Rank Fusion
-                   │
-                   ▼
-             Top-N Candidates
-                   │
-                   ▼
-            Feature Generation
-                   │
-                   ▼
-          XGBoost LTR Re-Ranker
-                   │
-                   ▼
-          Top-K Recommendations
-                   │
-                   ▼
-              FastAPI Response
-```
 
 ---
 
