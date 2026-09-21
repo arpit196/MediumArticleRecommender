@@ -9,7 +9,7 @@ An end-to-end recommendation pipeline designed to surface relevant Medium articl
   - Hybrid search algorithm: Combines semantic dense retrieval (LLM vector embeddings) with lexical sparse retrieval (BM25) to catch both conceptual meaning and exact keyword matches.
   - Reciprocal Rank Fusion (RRF): Implements a robust RRF algorithm to holistically merge and score candidates from disparate retrieval streams without requiring score normalization.
   - Learning-to-Rank (LTR): Utilizes an XGBoost Ranker trained specifically on Listwise ranking objectives to optimize user satisfaction.
-  - Advanced Evaluation: Built-in evaluation tracking leveraging Normalized Discounted Cumulative Gain (NDCG) and Mean Reciprocal Rank (MRR).
+  - Advanced Evaluation: Built-in evaluation tracking leveraging Normalized Discounted Cumulative Gain (NDCG) and Mean Reciprocal Rank (MRR) along with Recall@K and Precision@K.
 
 Tech Stack & Tools
    - Core ML/Ranking: XGBoost (LambdaMART implementation)
@@ -18,6 +18,24 @@ Tech Stack & Tools
    - Vector Operations: SciPy (Cosine Similarity metrics)
 
 ---
+To Run the recommendation service:
+The service endpoints are written using FastAPI and can be accessed using the following POST endpoints
+1 ```curl http://localhost:8000/health``` This tests readiness of the service
+To send a request containing read history and get the recommended articles, run a query in the following format:
+```curl -X POST "http://localhost:8000/recommend" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user_history": [
+      "N55528",
+      "N19639",
+      "N61837",
+      "N53526"
+    ],
+    "top_k": 5,
+    "retrieve_k": 100
+  }' ```
+
+
 
 To Run the Recommender Service on Docker:
 
