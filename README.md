@@ -230,8 +230,6 @@ curl -X POST "http://localhost:8000/recommend" \
 
 ---
 
----
-
 ## 🎯 Design Goals
 
 The project is designed around several practical recommendation-system principles:
