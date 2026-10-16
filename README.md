@@ -68,17 +68,7 @@ See it in action
   with P95 latency of 1.21 s; see the full load curve below.
 - **Verification:** 67 tests passed locally; 95.61% line coverage of `app.py`.
   GitHub Actions is configured to test pushes and pull requests.
-
-
-### Personalized User Representations
-
-User preferences are represented using historical article interactions and dense document embeddings, allowing recommendations to reflect both long-term interests and recent reading behaviour.
-
-### Production-Style Inference API
-
-The recommendation engine is exposed through **FastAPI**, separating offline model development from online inference.
-
-The API loads the trained ranking model, vector index, metadata, and embedding artifacts at startup and serves recommendations through a low-latency HTTP endpoint.
+- **Production-Style Inference API:** The recommendation engine is exposed through **FastAPI**, which loads the trained ranking model, vector index, metadata, and embedding artifacts at startup and serves recommendations through a low-latency HTTP endpoint.
 
 ### Advanced Evaluation
 
@@ -92,7 +82,14 @@ Recommendation quality is evaluated using ranking and retrieval metrics includin
 These metrics allow the retrieval and ranking stages to be evaluated independently rather than treating recommendation quality as a single black-box metric.
 
 Measured results
+| Metric | Before | After | Relative improvement |
+|---|---:|---:|---:|
+| **NDCG@10** | 0.3861 | **0.4672** | **+21.0%** |
+| **MRR** | 0.3412 | **0.4299** | **+26.0%** |
+| Precision@10 | 0.0818 | **0.0941** | **+15.1%** |
+| Recall@10 | 0.6273 | **0.6992** | **+11.5%** |
 
+### Load-test results
 **Local known-history workload**, not an AWS capacity benchmark:
 
 | Simulated users | Requests/s | P50 | P95 | P99 | Errors |
@@ -104,60 +101,25 @@ Measured results
 | 100 | 54.12 | 893 ms | 1,206 ms | 1,510 ms | 0
 
 
-## Running the Recommendation Service
+##Run it
 
-The inference service is implemented using **FastAPI**.
-
-By default, the service runs on:
-
-```text
-http://localhost:8000
-```
-
-### Check Service Health
+The serving artifacts and `news.tsv` are required locally and are not bundled in
+the source repository. Supply the matching release under `artifacts/recommender-v1.0/`
+(`faiss_hnsw_index.bin`, `embeddings_map.pkl`, `xgb_news_rerankerx.json`). The CTR map
+is optional. Only load pickle artifacts you trust.
 
 ```bash
-curl http://localhost:8000/health
+docker build -t next-read:local .
+docker run --rm -p 127.0.0.1:8000:8000 next-read:local
 ```
 
-The health endpoint verifies that the recommendation artifacts have been loaded successfully.
-
-A typical response includes information about the loaded FAISS index, embeddings, news metadata, and XGBoost model.
-
-### Check Service Readiness
+In another terminal:
 
 ```bash
-curl http://localhost:8000/ready
-```
-
-Expected response:
-
-```json
-{
-  "status": "ready"
-}
-```
-
----
-
-## 📡 Request Recommendations
-
-Send a user's reading history together with the required number of recommendations:
-
-```bash
-curl -X POST "http://localhost:8000/recommend" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "user_history": [
-      "N55528",
-      "N19639",
-      "N61837",
-      "N53526"
-    ],
-    "top_k": 5,
-    "retrieve_k": 100
-  }'
-```
+curl --fail http://127.0.0.1:8000/ready
+curl --fail http://127.0.0.1:8000/recommend \
+  -H 'Content-Type: application/json' \
+  -d '{"user_history":["N39445","N85056","N83529"],"top_k":4,"retrieve_k":100}'
 
 Where:
 
@@ -184,56 +146,13 @@ A typical response follows the structure:
 }
 ```
 
----
-
-# 🐳 Running with Docker
-
-## 1. Build the Image
+Use an empty history for cold recommendations. Interactive API docs are at
+`http://127.0.0.1:8000/docs`. For the browser UI:
 
 ```bash
-docker build -t rec-engine:latest .
+python -m pip install -r demo/requirements.txt
+python -m uvicorn demo.server:app --host 127.0.0.1 --port 8080
 ```
-
-## 2. Run the Container
-
-```bash
-docker run --rm \
-  -p 8000:8000 \
-  --name rec-engine \
-  rec-engine:latest
-```
-
-Alternatively, if Docker Compose is configured:
-
-```bash
-docker compose up --build
-```
-
-## 3. Verify the Container
-
-```bash
-curl http://localhost:8000/health
-```
-
-Then request recommendations:
-
-```bash
-curl -X POST "http://localhost:8000/recommend" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "user_history": [
-      "N55528",
-      "N19639",
-      "N61837"
-    ],
-    "top_k": 5,
-    "retrieve_k": 100
-  }'
-```
-
-> If Docker Compose maps container port `8000` to host port `8080`, replace `localhost:8000` with `localhost:8080`.
-
----
 
 ## 🎯 Design Goals
 
