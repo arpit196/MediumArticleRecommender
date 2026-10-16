@@ -56,26 +56,19 @@ BM25 Retrieval ──────┘              │
 ```
 
 ---
+See it in action
+
+![Next Read: an article read produces four related recommendations and a saved reading trail](docs/images/next-read-demo.png)
 
 ## 🚀 Key Features & Engineering Highlights
 
-### Hybrid Retrieval
+- **Working demo:** article previews, topic filters, persistent reading trails,
+  and separate reader sessions. [Run the demo](demo/README.md).
+- **Measured serving behavior:** 54.1 requests/s at 100 simulated users locally,
+  with P95 latency of 1.21 s; see the full load curve below.
+- **Verification:** 67 tests passed locally; 95.61% line coverage of `app.py`.
+  GitHub Actions is configured to test pushes and pull requests.
 
-Combines **semantic dense retrieval** using vector embeddings with **lexical sparse retrieval using BM25**.
-
-Dense retrieval captures conceptual similarity between users and articles, while BM25 preserves exact keyword and terminology matching.
-
-### Reciprocal Rank Fusion
-
-Implements **Reciprocal Rank Fusion (RRF)** to combine candidates from the dense and sparse retrieval pipelines.
-
-RRF merges rankings from heterogeneous retrieval systems (BM25 and vector search) without requiring their raw relevance scores to be directly comparable or normalized.
-
-### Learning-to-Rank
-
-Uses an **XGBoost ranking model** to re-rank retrieved candidates using user, document, similarity, behavioural, and positional features.
-
-The ranking stage transforms a broad, high-recall candidate set into a smaller set of highly personalized recommendations.
 
 ### Personalized User Representations
 
@@ -97,6 +90,18 @@ Recommendation quality is evaluated using ranking and retrieval metrics includin
 * **Precision@K**
 
 These metrics allow the retrieval and ranking stages to be evaluated independently rather than treating recommendation quality as a single black-box metric.
+
+Measured results
+
+**Local known-history workload**, not an AWS capacity benchmark:
+
+| Simulated users | Requests/s | P50 | P95 | P99 | Errors |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 5 | 4.87 | 28 ms | 56 ms | 64 ms | 0 |
+| 10 | 9.63 | 31 ms | 92 ms | 108 ms | 0 |
+| 25 | 24.22 | 26 ms | 59 ms | 79 ms | 0 |
+| 50 | 44.93 | 33 ms | 214 ms | 2,779 ms | 0 |
+| 100 | 54.12 | 893 ms | 1,206 ms | 1,510 ms | 0
 
 
 ## Running the Recommendation Service
