@@ -1,0 +1,10 @@
+# Local API-test environment and generated reports
+.venv-test/
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+test-results/
+tests/__pycache__/
+demo/__pycache__/
+demo/.data/

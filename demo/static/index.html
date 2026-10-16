@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A quieter place to discover your next read. A session-based news recommendation demo.">
+  <title>Next Read — A little more your world.</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <script defer src="/static/app.js"></script>
+</head>
+<body>
+  <header class="masthead wrap">
+    <a href="/" class="brand" aria-label="Next Read home"><span class="brand-mark">n<span>r</span></span><span>next read<span class="brand-dot">.</span></span></a>
+    <span class="header-caption">A LITTLE MORE YOUR WORLD</span>
+    <button class="button button-small" id="new-session">New reader <span aria-hidden="true">↗</span></button>
+  </header>
+
+  <main class="wrap">
+    <section class="intro">
+      <div><div class="eyebrow"><span class="live-dot"></span> YOUR PERSONAL READING ROOM</div>
+        <h1>One good read<br>leads to <em>another.</em></h1>
+        <p class="intro-copy">Follow your curiosity. Read an article, and discover<br class="desktop-break"> four more picked for where your interests take you.</p>
+      </div>
+      <div class="intro-note"><span class="note-spark" aria-hidden="true">✳</span><p>A little curiosity.<br>A fresh perspective.<br><em>Something just for you.</em></p><span class="note-rule"></span><span class="note-caption">LESS SCROLLING. MORE DISCOVERY.</span></div>
+    </section>
+
+    <div id="error-banner" class="error-banner" role="status" hidden><span id="error-message"></span><button id="retry">Try again ↗</button></div>
+    <div class="workspace">
+      <div class="main-column">
+        <section aria-labelledby="recommendations-heading" class="recommendation-section">
+          <div class="section-header"><div><div class="eyebrow muted" id="recommendation-kicker">A PLACE TO BEGIN</div><h2 id="recommendations-heading">Picked for you<span class="accent">.</span></h2></div><span id="recommendation-mode" class="pill">Getting ready</span></div>
+          <p class="section-description" id="recommendation-description">Your next four reads, one small discovery at a time.</p>
+          <div id="recommendations" class="recommendations" aria-live="polite" aria-busy="true"><div class="loading">Opening your reading room…</div></div>
+        </section>
+
+        <section class="explore-section" aria-labelledby="explore-heading">
+          <div class="section-header"><h2 id="explore-heading">A little of everything</h2><span class="section-aside">THE STARTER SHELF</span></div>
+          <p class="section-description">Find a first read. The more you explore, the more personal it gets.</p>
+          <div id="topics" class="topics" aria-label="Filter articles by topic"></div>
+          <div id="catalog" class="catalog"></div>
+          <button class="text-button show-more" id="show-more" hidden>Explore more articles <span aria-hidden="true">↓</span></button>
+        </section>
+      </div>
+
+      <aside class="reading-sidebar">
+        <div class="session-heading"><span class="session-icon" aria-hidden="true">◈</span><span>YOUR READING TRAIL</span></div>
+        <div class="session-meta"><span id="session-label">Starting session…</span><span class="pill pill-white" id="session-type">New reader</span></div>
+        <div class="read-counter"><strong id="read-count">0</strong><span>articles read<br><span class="muted">a story in the making</span></span></div>
+        <div class="trail" id="history"><div class="empty-trail"><span aria-hidden="true">⌁</span><p>Your curiosity starts here.</p><small>Open an article and mark it as read.<br>Your trail will appear right here.</small></div></div>
+        <button class="text-button reset-button" id="reset-history" disabled>Reset reading history ↺</button>
+        <div class="how-it-works"><span class="eyebrow muted">A SMALL GUIDE</span><ol><li><span>01</span>Find something interesting.</li><li><span>02</span>Open it. Take a moment.</li><li><span>03</span>Mark as read. Get your next four.</li></ol></div>
+        <div class="connection"><span id="connection-dot" class="connection-dot"></span><span id="connection-label">Checking recommendation API</span></div>
+        <div id="model-timing" class="model-timing"></div>
+      </aside>
+    </div>
+
+    <footer><span class="footer-brand">next read.</span><p>A recommendation demo powered by FAISS + XGBoost.<br>MIND archive · Article previews, not a live news feed.</p><span class="footer-note">MADE FOR THE CURIOUS.</span></footer>
+  </main>
+
+  <dialog id="reader" aria-labelledby="reader-title">
+    <div class="reader-top"><span class="eyebrow muted">TAKE A MOMENT</span><button id="close-reader" class="icon-button" aria-label="Close article">✕</button></div>
+    <div class="reader-meta"><span id="reader-category" class="category-label"></span><span>MIND ARCHIVE</span></div>
+    <h2 id="reader-title"></h2>
+    <div class="reader-divider"></div>
+    <p class="reader-abstract" id="reader-abstract"></p>
+    <p class="excerpt-note">This is the abstract supplied by the dataset. The full article may be available at the original archive link.</p>
+    <a id="publisher-link" class="publisher-link" target="_blank" rel="noopener noreferrer">Open original article ↗</a>
+    <div class="reader-action"><p>Finished exploring?<br><span>Let your next read find you.</span></p><button class="button button-primary" id="mark-read">Mark as read <span aria-hidden="true">→</span></button></div>
+  </dialog>
+  <div class="toast" id="toast" role="status" hidden></div>
+</body>
+</html>
